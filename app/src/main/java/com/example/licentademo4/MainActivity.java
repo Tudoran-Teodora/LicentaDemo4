@@ -1,9 +1,11 @@
 package com.example.licentademo4;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,13 +20,21 @@ import android.util.Base64;
 import android.util.Base64OutputStream;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -52,10 +62,15 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     Bitmap bitmap;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         imageView = findViewById(R.id.imageView);
         btnCamera = findViewById(R.id.buttonCamera);
@@ -66,9 +81,12 @@ public class MainActivity extends AppCompatActivity {
 //                intent.setType("image/*");
 //                startActivityForResult(intent, 100);
 
+
+
                 Intent i = new Intent(
                         Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 i.setType("image/*");
+
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
 
 
@@ -117,5 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
 
 }
