@@ -19,6 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -36,6 +39,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ClassifyActivity extends AppCompatActivity {
 
     private int inputSize=299;
@@ -51,7 +55,7 @@ public class ClassifyActivity extends AppCompatActivity {
 
     StorageReference storageReference;
     DatabaseReference databaseReference;
-
+    TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +69,18 @@ public class ClassifyActivity extends AppCompatActivity {
 
 
         initViews();
+
+      //  textView=(TextView)findViewById(R.id.textView);
+
+        if(!Python.isStarted())
+            Python.start(new AndroidPlatform(this));
+
+        Python py=Python.getInstance();
+
+        PyObject pyobj=py.getModule("script");
+        PyObject obj=pyobj.callAttr("main");
+        Toast.makeText(getApplicationContext(),obj.toString(),Toast.LENGTH_LONG).show();
+       // textView.setText(obj.toString());
 
     }
     private void initClassifier() throws IOException{
@@ -95,7 +111,7 @@ public class ClassifyActivity extends AppCompatActivity {
                 }
 
                 for(int i=0;i<uploads.size();i++){
-                    Toast.makeText(getApplicationContext(),String.valueOf(uploads.get(i)),Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(),String.valueOf(uploads.get(i)),Toast.LENGTH_LONG).show();
                 }
             }
 
