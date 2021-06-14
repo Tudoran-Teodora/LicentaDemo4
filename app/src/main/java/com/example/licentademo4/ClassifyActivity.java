@@ -21,8 +21,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -30,6 +33,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClassifyActivity extends AppCompatActivity {
@@ -42,6 +46,8 @@ public class ClassifyActivity extends AppCompatActivity {
     private Bitmap bitmap;
     private ImageView imageView;
     private Button btnPredict;
+
+    private List<Upload> uploads;
 
     StorageReference storageReference;
     DatabaseReference databaseReference;
@@ -76,6 +82,29 @@ public class ClassifyActivity extends AppCompatActivity {
 
         storageReference= FirebaseStorage.getInstance().getReference("uploads");
         databaseReference= FirebaseDatabase.getInstance().getReference("uploads");
+
+        uploads=new ArrayList<>();
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                    Upload upload=dataSnapshot.getValue(Upload.class);
+                    uploads.add(upload);
+
+                }
+
+                for(int i=0;i<uploads.size();i++){
+                    Toast.makeText(getApplicationContext(),String.valueOf(uploads.get(i)),Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+                Toast.makeText(getApplicationContext(),error.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
 
 
         tvRezultat=findViewById(R.id.tvRezultat);
