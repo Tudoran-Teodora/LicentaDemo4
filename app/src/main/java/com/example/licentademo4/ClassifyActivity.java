@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -33,8 +34,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +49,7 @@ import java.util.List;
 public class ClassifyActivity extends AppCompatActivity {
 
     private int inputSize=299;
-    private String modelPath="model100.tflite";
+    private String modelPath="modelClasificare.tflite";
     private String labelPath="labels.txt";
     private Classifier classifier;
     private TextView tvRezultat;
@@ -55,11 +61,13 @@ public class ClassifyActivity extends AppCompatActivity {
 
     StorageReference storageReference;
     DatabaseReference databaseReference;
-    TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_classify);
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
 
         try {
             initClassifier();
@@ -78,8 +86,8 @@ public class ClassifyActivity extends AppCompatActivity {
         Python py=Python.getInstance();
 
         PyObject pyobj=py.getModule("script");
-        PyObject obj=pyobj.callAttr("main");
-        Toast.makeText(getApplicationContext(),obj.toString(),Toast.LENGTH_LONG).show();
+      //  PyObject obj=pyobj.callAttr("main");
+        //Toast.makeText(getApplicationContext(),obj.toString(),Toast.LENGTH_LONG).show();
        // textView.setText(obj.toString());
 
     }
@@ -110,9 +118,7 @@ public class ClassifyActivity extends AppCompatActivity {
 
                 }
 
-                for(int i=0;i<uploads.size();i++){
-                    //Toast.makeText(getApplicationContext(),String.valueOf(uploads.get(i)),Toast.LENGTH_LONG).show();
-                }
+
             }
 
             @Override
@@ -121,6 +127,8 @@ public class ClassifyActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),error.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
+
+
 
 
         tvRezultat=findViewById(R.id.tvRezultat);
@@ -148,27 +156,33 @@ public class ClassifyActivity extends AppCompatActivity {
 
                 Bitmap bitmap=((BitmapDrawable)((ImageView)imageView).getDrawable()).getBitmap();
 
-                float result=classifier.recognizeImage(bitmap);
+                float[] result=classifier.recognizeImage(bitmap);
 
 
-                DecimalFormat df = new DecimalFormat();
-                df.setMaximumFractionDigits(2);
-                String rez=" Benign:"+String.format("%.2f", result*100)+"% Malign:"+String.format("%.2f", (1-result)*100)+"%";
+                if(result[2]>result[0]&&result[2]>result[1] ){
+                    Toast.makeText(getApplicationContext(),"Nu se poate identifica un melanom",Toast.LENGTH_LONG).show();
+                }else {
+                    DecimalFormat df = new DecimalFormat();
+                    df.setMaximumFractionDigits(2);
+                    String rez = " Benign:" + String.format("%.2f", result[0] * 100) + "% Malign:" + String.format("%.2f", result[1] * 100) + "%";
 
 
-                tvRezultat.setVisibility(View.VISIBLE);
-                //Toast.makeText(getApplicationContext(),rez,Toast.LENGTH_LONG).show();
-                tvRezultat.setText(rez);
+                    tvRezultat.setVisibility(View.VISIBLE);
+                    //Toast.makeText(getApplicationContext(),rez,Toast.LENGTH_LONG).show();
+                    tvRezultat.setText(rez);
 
-                uploadFile();
+                    uploadFile();
 
-               // PyObject obj =pythonObj.callAttr("main");
-                //tvRezultat.setText(obj.toString());
+                    // PyObject obj =pythonObj.callAttr("main");
+                    //tvRezultat.setText(obj.toString());
+
+                }
             }
         });
 
 
     }
+
 
     private String getFileExtension(Uri uri){
         ContentResolver contentResolver=getContentResolver();

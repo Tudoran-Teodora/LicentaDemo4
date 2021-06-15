@@ -65,10 +65,7 @@ public class MainActivity extends AppCompatActivity {
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            //    Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                i.setType("image/*");
-//
-//                startActivityForResult(i, CAMERA_CODE);
+
 
                 String fileName = System.currentTimeMillis()+".jpg";
                 ContentValues values = new ContentValues();
@@ -122,12 +119,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (requestCode == CAMERA_CODE && resultCode == RESULT_OK ) {
-            Toast.makeText(getApplicationContext(),"ceva",Toast.LENGTH_LONG).show();
 
             Bitmap bitmap = null;
-
-            //Uri uri = data.getData();
-
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -140,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             Intent intent1 = new Intent(getApplicationContext(), ClassifyActivity.class);
+
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);

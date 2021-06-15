@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LicentaDemo4"
+        android:configChanges="screenSize"
         >
         <activity android:name=".ClassifyActivity"></activity>
         <activity android:name=".MainActivity">
@@ -23,6 +24,7 @@
             </intent-filter>
         </activity>
     </application>
+
 
     <uses-feature android:name="android.hardware.camera"
         android:required="true" />

@@ -3,17 +3,12 @@ package com.example.licentademo4;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.renderscript.ScriptGroup;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import org.tensorflow.lite.Interpreter;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -64,17 +59,17 @@ public class Classifier {
         return labelList;
     }
 
-    float recognizeImage(Bitmap bitmap){
+    float[] recognizeImage(Bitmap bitmap){
         Bitmap scaledBitmap=Bitmap.createScaledBitmap(bitmap,INPUT_SIZE,INPUT_SIZE,false);
         ByteBuffer byteBuffer=convertBitmapToByteBuffer(scaledBitmap);
-        float[][]result=new float[1][1];
+        float[][]result=new float[1][3];
 
         interpreter.run(byteBuffer,result);
         //return result[0][0];
 //        Recognition rec=new Recognition(""+0,
 //                labelList.size()>0?labelList.get(1):"unknown",
 //                result[0][0]);
-        return result[0][0];
+        return result[0];
         //return getSortedResultFloat(result);
     }
 
